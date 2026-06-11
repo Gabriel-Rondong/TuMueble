@@ -1,0 +1,9 @@
+from django.apps import AppConfig
+
+class BodegaConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "apps.bodega"
+    verbose_name = "Bodega"
+
+    def ready(self):
+        import apps.bodega.signals  # noqa

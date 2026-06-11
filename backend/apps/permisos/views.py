@@ -1,0 +1,1 @@
+# Permisos gestionados desde apps.accounts

@@ -1,0 +1,1 @@
+# No models — reportes son endpoints de agregación

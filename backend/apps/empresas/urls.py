@@ -1,0 +1,8 @@
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import EmpresaViewSet, ModuloSistemaViewSet, EmpresaModuloViewSet
+
+router = DefaultRouter()
+router.register('', EmpresaViewSet, basename='empresas')
+
+urlpatterns = [path('', include(router.urls))]

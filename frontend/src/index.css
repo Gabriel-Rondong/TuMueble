@@ -1,0 +1,5 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #0A0A0A; color: #F5F5F5; -webkit-font-smoothing: antialiased; }
+input, button, select, textarea { font-family: inherit; }
+::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: #111; } ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #C8A45A; }
