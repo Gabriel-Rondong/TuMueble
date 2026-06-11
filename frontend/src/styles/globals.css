@@ -5,20 +5,27 @@
 @layer base {
   body {
     @apply bg-tm-dark text-tm-text;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: "Inter", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
   * { box-sizing: border-box; }
-  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: #1A1D24; }
-  ::-webkit-scrollbar-thumb { background: #2D3240; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb { background: #2D3240; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3D4357; }
+
+  /* Focus rings accesibles */
+  :focus-visible {
+    @apply outline-none ring-2 ring-tm-gold/50 ring-offset-1 ring-offset-tm-dark;
+  }
 }
 
 @layer components {
   .btn-gold {
-    @apply bg-tm-gold hover:bg-tm-gold-light text-tm-dark font-semibold px-4 py-2 rounded-lg transition-all duration-200;
+    @apply bg-tm-gold hover:bg-tm-gold-light active:scale-95 text-tm-dark font-semibold px-4 py-2 rounded-lg transition-all duration-150 cursor-pointer;
   }
   .btn-ghost {
-    @apply text-tm-muted hover:text-tm-text hover:bg-tm-card px-4 py-2 rounded-lg transition-all duration-200;
+    @apply text-tm-muted hover:text-tm-text hover:bg-tm-card active:scale-95 px-4 py-2 rounded-lg transition-all duration-150 cursor-pointer;
   }
   .card {
     @apply bg-tm-card border border-tm-border rounded-xl p-5;
@@ -26,9 +33,34 @@
   .input-field {
     @apply bg-tm-surface border border-tm-border rounded-lg px-3 py-2.5 text-tm-text w-full
            focus:outline-none focus:border-tm-gold focus:ring-1 focus:ring-tm-gold/30
-           placeholder-tm-muted text-sm transition-all;
+           placeholder-tm-muted text-sm transition-all duration-150;
   }
   .badge {
     @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium;
   }
+}
+
+@layer utilities {
+  /* Animaciones slide-in para toasts */
+  @keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  .animate-in { animation-fill-mode: both; }
+  .slide-in-from-right-4 { animation: slideInRight 0.2s ease-out; }
+
+  /* Shimmer para skeleton loading */
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  .skeleton {
+    background: linear-gradient(90deg, #21252F 25%, #2D3240 50%, #21252F 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    @apply rounded;
+  }
+
+  .delay-75 { animation-delay: 75ms; }
+  .delay-150 { animation-delay: 150ms; }
 }

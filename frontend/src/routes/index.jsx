@@ -26,6 +26,7 @@ import ConfiguracionPage from '../pages/empresa/ConfiguracionPage'
 import OrdenesPage from '../pages/produccion/OrdenesPage'
 import EstadoProductosPage from '../pages/produccion/EstadoProductosPage'
 import OrdenDetallePage from '../pages/produccion/OrdenDetallePage'
+import NuevaOrdenPage from '../pages/produccion/NuevaOrdenPage'
 
 // Platform (Superadmin)
 import PlatformDashboard from '../pages/platform/PlatformDashboard'
@@ -88,6 +89,7 @@ function RouterContent() {
               <Route path="dashboard"         element={<DashboardPage />} />
               <Route path="estado-productos"  element={<EstadoProductosPage />} />
               <Route path="ordenes"           element={<OrdenesPage />} />
+              <Route path="ordenes/nueva"      element={<NuevaOrdenPage />} />
               <Route path="ordenes/:id"       element={<OrdenDetallePage />} />
               <Route path="clientes"          element={<ClientesPage />} />
               <Route path="proveedores"       element={<ProveedoresPage />} />
