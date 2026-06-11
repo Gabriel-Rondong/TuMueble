@@ -1,139 +1,144 @@
 import { useState } from 'react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts'
-import Badge from '../../components/ui/Badge'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../contexts/AuthContext'
+import logoTumueble from '../../assets/logo_tumueble.png'
 
-const REPORTES = [
-  { id:'productos-vendidos', nombre:'Productos más vendidos', icon:'🏆', cat:'Ventas' },
-  { id:'rentabilidad', nombre:'Rentabilidad por producto', icon:'💰', cat:'Finanzas' },
-  { id:'perdida', nombre:'Productos con pérdida', icon:'📉', cat:'Finanzas' },
-  { id:'stock', nombre:'Stock actual', icon:'📦', cat:'Bodega' },
-  { id:'stock-critico', nombre:'Stock crítico', icon:'⚠️', cat:'Bodega' },
-  { id:'movimientos', nombre:'Movimientos de bodega', icon:'🔄', cat:'Bodega' },
-  { id:'trazabilidad-orden', nombre:'Trazabilidad por orden', icon:'🔍', cat:'Producción' },
-  { id:'trazabilidad-lote', nombre:'Trazabilidad por lote', icon:'🏷️', cat:'Producción' },
-  { id:'ordenes-atrasadas', nombre:'Órdenes atrasadas', icon:'⏰', cat:'Producción' },
-  { id:'no-conformidades', nombre:'No conformidades', icon:'🚨', cat:'Calidad' },
-  { id:'merma', nombre:'Merma por etapa', icon:'♻️', cat:'Calidad' },
-  { id:'proveedores', nombre:'Evaluación proveedores', icon:'🚚', cat:'Compras' },
-  { id:'facturas-compra', nombre:'Facturas de compra', icon:'🧾', cat:'Finanzas' },
-  { id:'facturas-venta', nombre:'Facturas de venta', icon:'📄', cat:'Finanzas' },
-  { id:'auditoria', nombre:'Auditoría de cambios', icon:'🔐', cat:'Sistema' },
-]
+export default function LoginPage() {
+  const { login } = useAuth()
+  const navigate = useNavigate()
 
-const RENTABILIDAD = [
-  { producto:'Closet Corredera', ingresos:12, costos:7.2, margen:40 },
-  { producto:'Cocina Integral', ingresos:28, costos:18.5, margen:33.9 },
-  { producto:'Mesa Comedor', ingresos:8.9, costos:4.2, margen:52.8 },
-  { producto:'Velador Flotante', ingresos:2.8, costos:1.9, margen:32.1 },
-  { producto:'Archivero', ingresos:4.8, costos:3.1, margen:35.4 },
-]
+  const [form, setForm] = useState({ email: '', password: '' })
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
-const CATS = ['Todos','Ventas','Finanzas','Bodega','Producción','Calidad','Compras','Sistema']
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
 
-export default function ReportesPage() {
-  const [catFiltro, setCatFiltro] = useState('Todos')
-  const [seleccionado, setSeleccionado] = useState(null)
-  const [fechaInicio, setFechaInicio] = useState('2026-01-01')
-  const [fechaFin, setFechaFin] = useState('2026-06-30')
-
-  const filtrados = REPORTES.filter(r => catFiltro === 'Todos' || r.cat === catFiltro)
+    try {
+      const user = await login(form.email, form.password)
+      navigate(user.es_superusuario_plataforma ? '/platform' : '/app/dashboard', { replace: true })
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Email o contraseña incorrectos.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-tm-text">Centro de Reportes</h1>
-          <p className="text-tm-muted text-sm mt-1">{REPORTES.length} reportes disponibles · Exportación PDF y Excel</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <input type="date" value={fechaInicio} onChange={e => setFechaInicio(e.target.value)}
-              className="input-field text-xs w-36" />
-            <span className="text-tm-muted text-xs">→</span>
-            <input type="date" value={fechaFin} onChange={e => setFechaFin(e.target.value)}
-              className="input-field text-xs w-36" />
+    <div className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#F4F1EA] px-6 py-10 text-[#111827]">
+      {/* Fondo suave institucional */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(201,150,58,0.12),transparent_34%),radial-gradient(circle_at_bottom,rgba(15,23,42,0.08),transparent_32%)]" />
+
+      <div className="relative z-10 w-full max-w-xl">
+        {/* Logo superior */}
+        <div className="mb-8 flex flex-col items-center text-center">
+          <div className="flex h-28 w-28 items-center justify-center rounded-[28px] border border-[#C9963A]/30 bg-[#0B111C] p-5 shadow-[0_22px_55px_rgba(15,23,42,0.22)]">
+            <img
+              src={logoTumueble}
+              alt="TuMueble"
+              className="h-full w-full object-contain"
+            />
           </div>
+
+          <h1 className="mt-5 text-4xl font-bold tracking-tight text-[#C9963A]">
+            TuMueble
+          </h1>
+
+          <p className="mt-1 text-sm font-medium uppercase tracking-[0.24em] text-slate-500">
+            ERP Productivo
+          </p>
         </div>
-      </div>
 
-      {/* Filtros categoría */}
-      <div className="flex gap-2 flex-wrap">
-        {CATS.map(c => (
-          <button key={c} onClick={() => setCatFiltro(c)}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${catFiltro === c ? 'bg-tm-gold text-tm-dark' : 'bg-tm-surface text-tm-muted hover:text-tm-text border border-tm-border'}`}>
-            {c}
-          </button>
-        ))}
-      </div>
+        {/* Card login */}
+        <div className="rounded-[32px] border border-[#D8D0C3] bg-white/95 p-10 shadow-[0_28px_80px_rgba(15,23,42,0.16)] backdrop-blur">
+          <div className="mb-8">
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#C9963A]">
+              Acceso institucional
+            </p>
 
-      <div className="grid grid-cols-4 gap-3">
-        {filtrados.map(r => (
-          <div key={r.id}
-            onClick={() => setSeleccionado(seleccionado === r.id ? null : r.id)}
-            className={`card cursor-pointer transition-all hover:border-tm-gold/40 ${seleccionado === r.id ? 'border-tm-gold/60 bg-tm-gold/5' : ''}`}>
-            <div className="text-2xl mb-2">{r.icon}</div>
-            <div className="text-tm-text font-medium text-sm mb-1">{r.nombre}</div>
-            <Badge variante="gray">{r.cat}</Badge>
+            <h2 className="mt-3 text-3xl font-bold text-[#111827]">
+              Iniciar sesión
+            </h2>
+
+            <p className="mt-3 max-w-md text-base leading-7 text-slate-500">
+              Ingresa tus credenciales para acceder al panel de gestión de TuMueble.
+            </p>
           </div>
-        ))}
-      </div>
 
-      {seleccionado && (
-        <div className="card">
-          {seleccionado === 'rentabilidad' && (
-            <>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-tm-text">Rentabilidad por Producto (CLP millones)</h3>
-                <div className="flex gap-2">
-                  <button className="btn-ghost text-xs border border-tm-border py-1.5">📄 Exportar PDF</button>
-                  <button className="btn-gold text-xs py-1.5">📊 Exportar Excel</button>
-                </div>
-              </div>
-              <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={RENTABILIDAD} barGap={4}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2D3240" />
-                  <XAxis dataKey="producto" tick={{ fill: '#7A8099', fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: '#7A8099', fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={{ background: '#21252F', border: '1px solid #2D3240', borderRadius: 8 }} />
-                  <Bar dataKey="ingresos" fill="#C9963A" radius={[4,4,0,0]} name="Ingresos" />
-                  <Bar dataKey="costos" fill="#3B82F6" radius={[4,4,0,0]} name="Costos" />
-                </BarChart>
-              </ResponsiveContainer>
-              <div className="mt-4 overflow-hidden rounded-lg border border-tm-border">
-                <table className="w-full text-sm">
-                  <thead className="bg-tm-surface">
-                    <tr>{['Producto','Ingresos','Costos','Utilidad','Margen'].map(h => (
-                      <th key={h} className="text-left text-xs text-tm-muted font-medium px-4 py-2.5 uppercase tracking-wider">{h}</th>
-                    ))}</tr>
-                  </thead>
-                  <tbody>
-                    {RENTABILIDAD.map(r => (
-                      <tr key={r.producto} className="border-t border-tm-border/50">
-                        <td className="px-4 py-2.5 text-tm-text">{r.producto}</td>
-                        <td className="px-4 py-2.5 font-mono text-tm-text">${r.ingresos}M</td>
-                        <td className="px-4 py-2.5 font-mono text-tm-muted">${r.costos}M</td>
-                        <td className="px-4 py-2.5 font-mono text-green-400">${(r.ingresos - r.costos).toFixed(1)}M</td>
-                        <td className="px-4 py-2.5 font-semibold text-tm-gold">{r.margen}%</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </>
-          )}
-          {seleccionado !== 'rentabilidad' && (
-            <div className="text-center py-12 text-tm-muted">
-              <div className="text-4xl mb-3">{REPORTES.find(r=>r.id===seleccionado)?.icon}</div>
-              <div className="font-medium text-tm-text mb-1">{REPORTES.find(r=>r.id===seleccionado)?.nombre}</div>
-              <p className="text-sm">Reporte disponible — conectar con API para cargar datos reales.</p>
-              <div className="flex justify-center gap-3 mt-4">
-                <button className="btn-ghost text-xs border border-tm-border py-2 px-4">📄 Exportar PDF</button>
-                <button className="btn-gold text-xs py-2 px-4">📊 Exportar Excel</button>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                Correo electrónico
+              </label>
+
+              <input
+                type="email"
+                placeholder="usuario@tumueble.cl"
+                value={form.email}
+                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                required
+                autoFocus
+                className="w-full rounded-2xl border border-slate-200 bg-[#EAF1FF] px-5 py-4 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-[#C9963A] focus:bg-white focus:ring-4 focus:ring-[#C9963A]/15"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                Contraseña
+              </label>
+
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={form.password}
+                  onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+                  required
+                  className="w-full rounded-2xl border border-slate-200 bg-[#EAF1FF] px-5 py-4 pr-16 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-[#C9963A] focus:bg-white focus:ring-4 focus:ring-[#C9963A]/15"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 transition hover:text-[#C9963A]"
+                >
+                  {showPassword ? 'Ocultar' : 'Ver'}
+                </button>
               </div>
             </div>
-          )}
+
+            {error && (
+              <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-2xl bg-[#C9963A] px-4 py-4 text-base font-bold text-[#111827] shadow-[0_16px_35px_rgba(201,150,58,0.28)] transition-all hover:-translate-y-0.5 hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loading ? 'Ingresando...' : 'Ingresar al sistema'}
+            </button>
+          </form>
+
+          <div className="mt-8 border-t border-slate-200 pt-6 text-center">
+            <p className="text-sm text-slate-500">
+              ¿Problemas de acceso?{' '}
+              <span className="font-bold text-[#C9963A]">
+                Contacta a tu administrador.
+              </span>
+            </p>
+          </div>
         </div>
-      )}
+
+        <p className="mt-7 text-center text-xs text-slate-500">
+          Acceso exclusivo para usuarios autorizados · TuMueble ERP
+        </p>
+      </div>
     </div>
   )
 }
