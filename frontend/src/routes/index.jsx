@@ -27,21 +27,17 @@ import OrdenesPage from '../pages/produccion/OrdenesPage'
 import EstadoProductosPage from '../pages/produccion/EstadoProductosPage'
 import OrdenDetallePage from '../pages/produccion/OrdenDetallePage'
 
-// Platform
+// Platform (Superadmin)
 import PlatformDashboard from '../pages/platform/PlatformDashboard'
 import EmpresasPage from '../pages/platform/EmpresasPage'
+import ModulosPage from '../pages/platform/ModulosPage'
+import AdministradoresPage from '../pages/platform/AdministradoresPage'
+import AuditoriaGlobalPage from '../pages/platform/AuditoriaGlobalPage'
+import ConfiguracionPlataformaPage from '../pages/platform/ConfiguracionPlataformaPage'
 
-// Portal
+// Portal cliente (público, sin login)
 import PortalConsultaPage from '../pages/portal/PortalConsultaPage'
 import PortalEstadoPage from '../pages/portal/PortalEstadoPage'
-
-const Placeholder = ({ titulo, icon='🚧' }) => (
-  <div className="flex flex-col items-center justify-center h-64 text-center">
-    <div className="text-5xl mb-4 opacity-40">{icon}</div>
-    <h2 className="text-xl font-bold text-tm-text mb-1">{titulo}</h2>
-    <p className="text-tm-muted text-sm">Disponible en próxima versión</p>
-  </div>
-)
 
 function RutaProtegida({ children, soloSuperAdmin = false }) {
   const { esAutenticado, cargando, esSuperAdmin } = useAuth()
@@ -61,28 +57,30 @@ function RutaProtegida({ children, soloSuperAdmin = false }) {
 function RouterContent() {
   return (
     <Routes>
-      {/* Público */}
+      {/* ── Páginas públicas ────────────────────────────── */}
       <Route path="/login" element={<AuthLayout><LoginPage /></AuthLayout>} />
+
+      {/* Portal del cliente (100% público, sin auth) */}
       <Route path="/mi-pedido" element={<PortalConsultaPage />} />
       <Route path="/mi-pedido/:token" element={<PortalEstadoPage />} />
 
-      {/* Superadmin plataforma */}
+      {/* ── Panel Superadmin Plataforma ─────────────────── */}
       <Route path="/platform/*" element={
         <RutaProtegida soloSuperAdmin>
           <AppLayout tipo="platform">
             <Routes>
-              <Route index element={<PlatformDashboard />} />
-              <Route path="empresas" element={<EmpresasPage />} />
-              <Route path="modulos" element={<Placeholder titulo="Módulos del Sistema" icon="📦" />} />
-              <Route path="administradores" element={<Placeholder titulo="Administradores" icon="👥" />} />
-              <Route path="auditoria" element={<Placeholder titulo="Auditoría Global" icon="🔍" />} />
-              <Route path="configuracion" element={<Placeholder titulo="Configuración Plataforma" icon="⚙️" />} />
+              <Route index                  element={<PlatformDashboard />} />
+              <Route path="empresas"        element={<EmpresasPage />} />
+              <Route path="modulos"         element={<ModulosPage />} />
+              <Route path="administradores" element={<AdministradoresPage />} />
+              <Route path="auditoria"       element={<AuditoriaGlobalPage />} />
+              <Route path="configuracion"   element={<ConfiguracionPlataformaPage />} />
             </Routes>
           </AppLayout>
         </RutaProtegida>
       } />
 
-      {/* ERP empresa — rutas completas */}
+      {/* ── ERP Empresa ─────────────────────────────────── */}
       <Route path="/app/*" element={
         <RutaProtegida>
           <AppLayout tipo="empresa">
@@ -110,6 +108,7 @@ function RouterContent() {
         </RutaProtegida>
       } />
 
+      {/* Redirecciones raíz */}
       <Route path="/" element={<Navigate to="/app/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/app/dashboard" replace />} />
     </Routes>
